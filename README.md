@@ -1,4 +1,4 @@
-# whatsprintisit-desktop-background
+# WhatSprintIsItWallpaper
 
 Sets your **Windows desktop wallpaper** to the current sprint — a clean, dark image with big
 centered text like **`278.1`** (sprint `.` week), inspired by [whatsprintis.it](https://whatsprintis.it/).
@@ -33,7 +33,7 @@ winget install nikolapeja6.WhatSprintIsItWallpaper
 ```
 
 Or download the latest `WhatSprintIsItWallpaper-<version>-setup.exe` from the
-[Releases](https://github.com/nikolapeja6/whatsprintisit-desktop-background/releases) page and run
+[Releases](https://github.com/nikolapeja6/WhatSprintIsItWallpaper/releases) page and run
 it. The installer is **per-user** and needs no administrator rights.
 
 ## Usage

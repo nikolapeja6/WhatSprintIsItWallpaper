@@ -10,7 +10,7 @@
   #define MyAppVersion "1.0.0"
 #endif
 #define MyAppPublisher "WhatSprintIsItWallpaper contributors"
-#define MyAppURL "https://github.com/nikolapeja6/whatsprintisit-desktop-background"
+#define MyAppURL "https://github.com/nikolapeja6/WhatSprintIsItWallpaper"
 #define MyAppExe "WhatSprintIsItWallpaper.exe"
 
 [Setup]

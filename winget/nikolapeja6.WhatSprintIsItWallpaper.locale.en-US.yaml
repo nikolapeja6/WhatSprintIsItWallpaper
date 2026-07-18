@@ -4,11 +4,11 @@ PackageVersion: 1.0.0
 PackageLocale: en-US
 Publisher: WhatSprintIsItWallpaper contributors
 PublisherUrl: https://github.com/nikolapeja6
-PublisherSupportUrl: https://github.com/nikolapeja6/whatsprintisit-desktop-background/issues
+PublisherSupportUrl: https://github.com/nikolapeja6/WhatSprintIsItWallpaper/issues
 PackageName: WhatSprintIsItWallpaper
-PackageUrl: https://github.com/nikolapeja6/whatsprintisit-desktop-background
+PackageUrl: https://github.com/nikolapeja6/WhatSprintIsItWallpaper
 License: MIT
-LicenseUrl: https://github.com/nikolapeja6/whatsprintisit-desktop-background/blob/main/LICENSE
+LicenseUrl: https://github.com/nikolapeja6/WhatSprintIsItWallpaper/blob/main/LICENSE
 Copyright: Copyright (c) WhatSprintIsItWallpaper contributors
 ShortDescription: Sets your Windows desktop wallpaper to the current sprint (e.g. 278.1).
 Description: >-
