@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: nikolapeja6.WhatSprintIsItWallpaper
+PackageVersion: 1.0.0
+InstallerType: inno
+Scope: user
+InstallModes:
+  - silent
+  - silentWithProgress
+InstallerSwitches:
+  Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /NOCANCEL
+  SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART /NOCANCEL
+UpgradeBehavior: install
+ReleaseDate: 2026-07-18
+Installers:
+  - Architecture: x64
+    # Replace <VERSION> and the SHA256 with the values from the GitHub Release (see release.yml output).
+    InstallerUrl: https://github.com/nikolapeja6/whatsprintisit-desktop-background/releases/download/v1.0.0/WhatSprintIsItWallpaper-1.0.0-setup.exe
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    ProductCode: '{7B2D9E14-4C3A-4F5B-9A21-8C0D2E7F1A93}_is1'
+ManifestType: installer
+ManifestVersion: 1.6.0

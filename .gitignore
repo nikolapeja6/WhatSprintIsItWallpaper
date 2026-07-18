@@ -1,0 +1,26 @@
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+publish/
+artifacts/
+
+# Rider / VS
+.vs/
+.idea/
+*.user
+
+# Test results
+[Tt]est[Rr]esults/
+*.trx
+coverage*.json
+coverage*.xml
+
+# Inno Setup output
+installer/Output/
+*.iss.bak
+
+# OS
+Thumbs.db
+Desktop.ini

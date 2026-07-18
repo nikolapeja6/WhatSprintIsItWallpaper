@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $v = '${{ github.event.inputs.version }}'
+          } else {
+            $v = '${{ github.ref_name }}' -replace '^v',''
+          }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Building version $v"
+
+      - name: Test
+        run: dotnet test WhatSprintIsItWallpaper.sln -c Release --nologo
+
+      - name: Publish (self-contained, single file)
+        shell: pwsh
+        run: >
+          dotnet publish src/WhatSprintIsItWallpaper/WhatSprintIsItWallpaper.csproj
+          -c Release -r win-x64
+          -p:Version=${{ steps.ver.outputs.version }}
+          -p:SelfContained=true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -o publish/win-x64
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.ver.outputs.version }} installer/setup.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+
+      - name: Compute SHA256
+        id: hash
+        shell: pwsh
+        run: |
+          $file = "installer/Output/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}-setup.exe"
+          $sha = (Get-FileHash $file -Algorithm SHA256).Hash
+          "sha256=$sha" >> $env:GITHUB_OUTPUT
+          Write-Host "Installer SHA256: $sha"
+          "### Installer SHA256`n``$sha``" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhatSprintIsItWallpaper-setup
+          path: installer/Output/*.exe
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/Output/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}-setup.exe
+          body: |
+            ## WhatSprintIsItWallpaper ${{ steps.ver.outputs.version }}
+
+            Per-user installer (no admin required). After installing, the desktop wallpaper updates
+            automatically at logon and once daily — no further action needed.
+
+            **Installer SHA256:** `${{ steps.hash.outputs.sha256 }}`
+
+            Update the winget manifest under `winget/` with this URL and SHA256, then submit a PR
+            to [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs).
