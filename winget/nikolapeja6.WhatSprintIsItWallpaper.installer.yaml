@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
 PackageIdentifier: nikolapeja6.WhatSprintIsItWallpaper
-PackageVersion: 1.0.0
+PackageVersion: 1.1.1
 InstallerType: wix
 Scope: user
 InstallModes:
@@ -18,10 +18,8 @@ AppsAndFeaturesEntries:
     InstallerType: wix
 Installers:
   - Architecture: x64
-    # Update InstallerUrl, InstallerSha256 and ProductCode from the GitHub Release / CI summary.
-    # ProductCode is auto-generated per build — copy the exact value the release workflow prints.
-    InstallerUrl: https://github.com/nikolapeja6/WhatSprintIsItWallpaper/releases/download/v1.0.0/WhatSprintIsItWallpaper-1.0.0.msi
-    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
-    ProductCode: '{00000000-0000-0000-0000-000000000000}'
+    InstallerUrl: https://github.com/nikolapeja6/WhatSprintIsItWallpaper/releases/download/v1.1.1/WhatSprintIsItWallpaper-1.1.1.msi
+    InstallerSha256: 7402E18D06C5EBF2DE09F6C95021A60E3FF8023E4850605E2491FFCE2DABDB7C
+    ProductCode: '{22EFD52E-A500-4ACB-93AC-DBE2E624D205}'
 ManifestType: installer
 ManifestVersion: 1.6.0
