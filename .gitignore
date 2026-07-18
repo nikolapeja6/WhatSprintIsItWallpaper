@@ -17,9 +17,9 @@ artifacts/
 coverage*.json
 coverage*.xml
 
-# Inno Setup output
-installer/Output/
-*.iss.bak
+# Installer (WiX) build output
+installer/bin/
+installer/obj/
 
 # OS
 Thumbs.db

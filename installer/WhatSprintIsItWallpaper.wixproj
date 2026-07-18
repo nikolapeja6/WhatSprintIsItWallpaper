@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <PropertyGroup>
+    <!-- Version and the folder holding the published exe can be overridden from the CLI/CI:
+         dotnet build installer\WhatSprintIsItWallpaper.wixproj -c Release
+           -p:ProductVersion=1.2.3 -p:PublishDir=..\publish\win-x64 -->
+    <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\publish\win-x64</PublishDir>
+
+    <OutputType>Package</OutputType>
+    <OutputName>WhatSprintIsItWallpaper-$(ProductVersion)</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+
+    <DefineConstants>ProductVersion=$(ProductVersion);PublishDir=$(PublishDir)</DefineConstants>
+  </PropertyGroup>
+
+</Project>

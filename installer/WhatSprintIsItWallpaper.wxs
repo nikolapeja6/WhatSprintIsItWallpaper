@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WiX MSI for WhatSprintIsItWallpaper.
+
+  Per-user install (no administrator rights needed) of the single self-contained exe. After the
+  files are laid down it runs "WhatSprintIsItWallpaper.exe install" to register the auto-update
+  scheduled task and apply the wallpaper immediately; on uninstall it runs "... uninstall" first
+  to remove the task. Both custom actions ignore failures so setup never rolls back over them
+  (the scheduled task self-heals at next logon anyway).
+
+  Built via the WixToolset.Sdk (see WhatSprintIsItWallpaper.wixproj) — no external tool needed
+  beyond the .NET SDK.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+      Name="WhatSprintIsItWallpaper"
+      Manufacturer="nikolapeja6"
+      Version="$(var.ProductVersion)"
+      UpgradeCode="7B2D9E14-4C3A-4F5B-9A21-8C0D2E7F1A93"
+      Scope="perUser"
+      Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Add/Remove Programs metadata. -->
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/nikolapeja6/WhatSprintIsItWallpaper" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/nikolapeja6/WhatSprintIsItWallpaper" />
+
+    <!-- Install under %LOCALAPPDATA%\Programs\WhatSprintIsItWallpaper (per-user, no elevation). -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsFolder" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="WhatSprintIsItWallpaper" />
+      </Directory>
+    </StandardDirectory>
+
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+      <Component Id="MainExeComponent" Guid="*">
+        <File Id="MainExecutable"
+              Source="$(var.PublishDir)\WhatSprintIsItWallpaper.exe"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="WhatSprintIsItWallpaper" Level="1">
+      <ComponentGroupRef Id="AppComponents" />
+    </Feature>
+
+    <!-- Post-install: register the scheduled task (logon + daily) and set the wallpaper now. -->
+    <CustomAction Id="RunAppInstall"
+                  FileRef="MainExecutable"
+                  ExeCommand="install"
+                  Execute="deferred"
+                  Impersonate="yes"
+                  Return="ignore" />
+
+    <!-- Pre-uninstall: remove the scheduled task while the exe still exists. -->
+    <CustomAction Id="RunAppUninstall"
+                  FileRef="MainExecutable"
+                  ExeCommand="uninstall"
+                  Execute="deferred"
+                  Impersonate="yes"
+                  Return="ignore" />
+
+    <InstallExecuteSequence>
+      <Custom Action="RunAppInstall" After="InstallFiles" Condition="NOT Installed" />
+      <Custom Action="RunAppUninstall" Before="RemoveFiles"
+              Condition="Installed AND (REMOVE = &quot;ALL&quot;) AND NOT UPGRADINGPRODUCTCODE" />
+    </InstallExecuteSequence>
+  </Package>
+</Wix>

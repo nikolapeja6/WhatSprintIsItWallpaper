@@ -51,43 +51,52 @@ jobs:
           -p:EnableCompressionInSingleFile=true
           -o publish/win-x64
 
-      - name: Install Inno Setup
-        run: choco install innosetup -y --no-progress
-
-      - name: Build installer
+      - name: Build MSI (WiX)
         shell: pwsh
-        run: |
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.ver.outputs.version }} installer/setup.iss
-          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+        run: >
+          dotnet build installer/WhatSprintIsItWallpaper.wixproj
+          -c Release
+          -p:ProductVersion=${{ steps.ver.outputs.version }}
+          -p:PublishDir=${{ github.workspace }}/publish/win-x64
 
-      - name: Compute SHA256
+      - name: Compute SHA256 and ProductCode
         id: hash
         shell: pwsh
         run: |
-          $file = "installer/Output/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}-setup.exe"
+          $file = "installer/bin/Release/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}.msi"
           $sha = (Get-FileHash $file -Algorithm SHA256).Hash
           "sha256=$sha" >> $env:GITHUB_OUTPUT
-          Write-Host "Installer SHA256: $sha"
-          "### Installer SHA256`n``$sha``" >> $env:GITHUB_STEP_SUMMARY
+          # Read the auto-generated ProductCode from the MSI (needed for the winget manifest).
+          $wi = New-Object -ComObject WindowsInstaller.Installer
+          $db = $wi.GetType().InvokeMember('OpenDatabase','InvokeMethod',$null,$wi,@((Resolve-Path $file).Path,0))
+          $view = $db.GetType().InvokeMember('OpenView','InvokeMethod',$null,$db,@("SELECT Value FROM Property WHERE Property='ProductCode'"))
+          $view.GetType().InvokeMember('Execute','InvokeMethod',$null,$view,$null) | Out-Null
+          $rec = $view.GetType().InvokeMember('Fetch','InvokeMethod',$null,$view,$null)
+          $productCode = $rec.GetType().InvokeMember('StringData','GetProperty',$null,$rec,@(1))
+          "productcode=$productCode" >> $env:GITHUB_OUTPUT
+          Write-Host "MSI SHA256: $sha"
+          Write-Host "MSI ProductCode: $productCode"
+          "### MSI details`n- **SHA256:** ``$sha```n- **ProductCode:** ``$productCode```n- **UpgradeCode:** ``{7B2D9E14-4C3A-4F5B-9A21-8C0D2E7F1A93}``" >> $env:GITHUB_STEP_SUMMARY
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WhatSprintIsItWallpaper-setup
-          path: installer/Output/*.exe
+          name: WhatSprintIsItWallpaper-msi
+          path: installer/bin/Release/*.msi
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: installer/Output/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}-setup.exe
+          files: installer/bin/Release/WhatSprintIsItWallpaper-${{ steps.ver.outputs.version }}.msi
           body: |
             ## WhatSprintIsItWallpaper ${{ steps.ver.outputs.version }}
 
             Per-user installer (no admin required). After installing, the desktop wallpaper updates
             automatically at logon and once daily — no further action needed.
 
-            **Installer SHA256:** `${{ steps.hash.outputs.sha256 }}`
+            **MSI SHA256:** `${{ steps.hash.outputs.sha256 }}`
+            **ProductCode:** `${{ steps.hash.outputs.productcode }}`
 
             Update the winget manifest under `winget/` with this URL and SHA256, then submit a PR
             to [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs).

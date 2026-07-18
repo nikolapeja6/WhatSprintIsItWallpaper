@@ -32,7 +32,7 @@ Via **winget** (once the package is published to the community repo):
 winget install nikolapeja6.WhatSprintIsItWallpaper
 ```
 
-Or download the latest `WhatSprintIsItWallpaper-<version>-setup.exe` from the
+Or download the latest `WhatSprintIsItWallpaper-<version>.msi` from the
 [Releases](https://github.com/nikolapeja6/WhatSprintIsItWallpaper/releases) page and run
 it. The installer is **per-user** and needs no administrator rights.
 
@@ -85,20 +85,23 @@ dotnet publish src/WhatSprintIsItWallpaper/WhatSprintIsItWallpaper.csproj -c Rel
   -o publish/win-x64
 ```
 
-Build the installer locally (requires [Inno Setup 6](https://jrsoftware.org/isinfo.php)):
+Build the installer (MSI) locally. It uses the [WiX Toolset](https://wixtoolset.org/) v5 via the
+`WixToolset.Sdk` MSBuild SDK, so **no extra tooling beyond the .NET SDK is required** — WiX is
+restored as a NuGet package. First publish the exe (above), then:
 
 ```powershell
-& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=1.0.0 installer/setup.iss
-# -> installer/Output/WhatSprintIsItWallpaper-1.0.0-setup.exe
+dotnet build installer/WhatSprintIsItWallpaper.wixproj -c Release `
+  -p:ProductVersion=1.0.0 -p:PublishDir=..\publish\win-x64
+# -> installer/bin/Release/WhatSprintIsItWallpaper-1.0.0.msi
 ```
 
 ## Releasing & publishing to winget
 
 1. Tag a version: `git tag v1.0.0 && git push origin v1.0.0`.
 2. The [`Release`](.github/workflows/release.yml) workflow tests, publishes the exe, builds the
-   Inno Setup installer, computes its SHA256, and attaches it to a GitHub Release.
-3. Update the manifests in [`winget/`](winget/) with the new version, `InstallerUrl`, and
-   `InstallerSha256` (printed in the workflow summary), then validate:
+   WiX MSI, computes its SHA256 and ProductCode, and attaches the `.msi` to a GitHub Release.
+3. Update the manifests in [`winget/`](winget/) with the new version, `InstallerUrl`,
+   `InstallerSha256`, and `ProductCode` (all printed in the workflow summary), then validate:
    ```powershell
    winget validate --manifest winget
    ```
