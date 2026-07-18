@@ -13,7 +13,7 @@
     <Version>1.0.0</Version>
     <Company>WhatSprintIsItWallpaper</Company>
     <Product>WhatSprintIsItWallpaper</Product>
-    <Authors>WhatSprintIsItWallpaper contributors</Authors>
+    <Authors>nikolapeja6</Authors>
     <Description>Sets the Windows desktop wallpaper to the current sprint (e.g. 278.1), using the whatsprintis.it formula.</Description>
 
     <!-- Publish settings are supplied on the command line (see README / CI):

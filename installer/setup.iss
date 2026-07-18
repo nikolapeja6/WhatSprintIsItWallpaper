@@ -9,7 +9,7 @@
 #ifndef MyAppVersion
   #define MyAppVersion "1.0.0"
 #endif
-#define MyAppPublisher "WhatSprintIsItWallpaper contributors"
+#define MyAppPublisher "nikolapeja6"
 #define MyAppURL "https://github.com/nikolapeja6/WhatSprintIsItWallpaper"
 #define MyAppExe "WhatSprintIsItWallpaper.exe"
 
