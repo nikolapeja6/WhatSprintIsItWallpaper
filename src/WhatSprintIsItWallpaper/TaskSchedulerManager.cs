@@ -7,8 +7,9 @@ namespace WhatSprintIsItWallpaper;
 
 /// <summary>
 /// Creates/removes the Windows Scheduled Task that keeps the wallpaper current. The task runs
-/// <c>WhatSprintIsItWallpaper.exe run</c> at logon and once daily (with "start when available" so a
-/// machine that was off still catches up). Implemented with <c>schtasks.exe</c> + an XML definition.
+/// <c>WhatSprintIsItWallpaper.exe run</c> shortly after logon and once daily (with "start when
+/// available" so a machine that was off still catches up). Implemented with <c>schtasks.exe</c>
+/// + an XML definition.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public static class TaskSchedulerManager
@@ -67,6 +68,7 @@ public static class TaskSchedulerManager
                 <LogonTrigger>
                   <Enabled>true</Enabled>
                   <UserId>{userEsc}</UserId>
+                  <Delay>PT15S</Delay>
                 </LogonTrigger>
                 <CalendarTrigger>
                   <StartBoundary>2020-01-01T00:05:00</StartBoundary>

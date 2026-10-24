@@ -17,12 +17,14 @@ Installing registers a **Scheduled Task** named `WhatSprintIsItWallpaper` that r
 `WhatSprintIsItWallpaper.exe run`:
 
 1. **Immediately at install** — the wallpaper is set the moment installation finishes.
-2. **At every logon / sign-in** — always correct after a reboot.
+2. **Shortly after every logon / sign-in** — waits briefly for docked displays to initialize, then
+   refreshes when the sprint or active monitor layout changed.
 3. **Once daily (~00:05)** with *start-when-available* — catches the Saturday rollover even on
    machines that were off or stayed logged in for weeks.
 
-Each run is cheap and idempotent: it computes the sprint, compares it to a cached value, and only
-re-renders and re-applies the wallpaper when the week/sprint actually changed.
+Each run is cheap and idempotent: it computes the sprint and captures the active monitor layout,
+then only re-renders and re-applies the wallpaper when the week/sprint, monitor configuration, or
+rendering settings changed.
 
 ## Install
 
@@ -121,10 +123,10 @@ removes the scheduled task; your wallpaper is left as-is.
 | `WallpaperImageRenderer.cs` | Renders the dark PNG with big auto-fit centered text (System.Drawing). |
 | `WallpaperSetter.cs` | Applies the wallpaper via `IDesktopWallpaper` COM (fallback: `SystemParametersInfo`). |
 | `TaskSchedulerManager.cs` | Registers/removes the scheduled task (logon + daily). |
+| `DisplayConfiguration.cs` | Captures monitor identities, bounds, and primary-monitor selection. |
 | `AppConfig.cs` / `AppState.cs` | JSON config and the idempotent "last applied" cache. |
 | `Program.cs` | CLI dispatch (`run`/`install`/`uninstall`/`preview`). |
 
 ## License
 
 [MIT](LICENSE).
-

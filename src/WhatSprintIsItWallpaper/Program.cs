@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 namespace WhatSprintIsItWallpaper;
@@ -41,11 +40,13 @@ internal static class Program
     {
         var config = AppConfig.Load();
         SprintInfo sprint = config.CreateCalculator().GetCurrent();
-        (int width, int height) = ResolveSize(config);
+        DisplaySnapshot displays = DisplayConfiguration.Capture();
+        (int width, int height) = ResolveSize(config, displays);
         string imagePath = AppPaths.WallpaperFile(width, height);
 
         string signature = string.Join('|',
-            sprint.Text, $"{width}x{height}", config.BackgroundColor, config.ForegroundColor,
+            sprint.Text, $"{width}x{height}", displays.Signature,
+            config.BackgroundColor, config.ForegroundColor,
             config.ShowCaption, config.FontFamily, config.FontBold, config.WallpaperPosition);
 
         var state = AppState.Load();
@@ -91,7 +92,8 @@ internal static class Program
     {
         var config = AppConfig.Load();
         SprintInfo sprint = config.CreateCalculator().GetCurrent();
-        (int width, int height) = ResolveSize(config);
+        DisplaySnapshot displays = DisplayConfiguration.Capture();
+        (int width, int height) = ResolveSize(config, displays);
 
         string previewPath = Path.Combine(
             Path.GetTempPath(), $"whatsprint-preview-{sprint.Sprint}.{sprint.Week}-{width}x{height}.png");
@@ -138,14 +140,12 @@ internal static class Program
         return 2;
     }
 
-    private static (int Width, int Height) ResolveSize(AppConfig config)
+    private static (int Width, int Height) ResolveSize(AppConfig config, DisplaySnapshot displays)
     {
         if (config.Width is int w && w > 0 && config.Height is int h && h > 0)
             return (w, h);
 
-        int sw = GetSystemMetrics(SM_CXSCREEN);
-        int sh = GetSystemMetrics(SM_CYSCREEN);
-        return (sw > 0 && sh > 0) ? (sw, sh) : (1920, 1080);
+        return (displays.PrimaryWidth, displays.PrimaryHeight);
     }
 
     private static string ExePath()
@@ -165,10 +165,4 @@ internal static class Program
 
         return processPath ?? candidate;
     }
-
-    private const int SM_CXSCREEN = 0;
-    private const int SM_CYSCREEN = 1;
-
-    [DllImport("user32.dll")]
-    private static extern int GetSystemMetrics(int nIndex);
 }
